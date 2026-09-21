@@ -12,6 +12,7 @@
 
 import type { VoiceSettings, VoiceOption } from "../settings/VoiceSettings";
 import type { PauseStyle } from "../types/ProcessorTypes";
+import type { HeadingJumpTarget } from "../utils/textSections";
 
 /**
  * Result of validating a provider's credentials
@@ -39,6 +40,15 @@ export interface NoteSectionInfo {
   title: string;
   /** False until that section's audio has been synthesized. */
   ready: boolean;
+  /** Where to put the editor caret. Null when the section has no heading. */
+  jump: HeadingJumpTarget | null;
+}
+
+/** One titled part of a note, ready to synthesize. */
+export interface NoteSectionInput {
+  title: string;
+  text: string;
+  jump?: HeadingJumpTarget | null;
 }
 
 export interface SpeechProvider {
@@ -67,7 +77,7 @@ export interface SpeechProvider {
    * that do not override this join the parts and call `speak()`.
    */
   speakNoteSections(
-    sections: { title: string; text: string }[],
+    sections: NoteSectionInput[],
     speed?: number,
     filePath?: string,
   ): Promise<void>;
@@ -80,6 +90,8 @@ export interface SpeechProvider {
   playNoteSection(index: number): void;
   /** Drop the in-note playlist (e.g. when the user plays a saved chapter file). */
   clearNotePlaylist(): void;
+  /** Vault path of the note this playlist was built from, if any. */
+  getNotePlaylistFilePath(): string | null;
 
   // Playback controls
   playAudio(speed?: number): Promise<void>;

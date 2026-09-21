@@ -1,4 +1,8 @@
-import { MarkdownView, TFile, App } from "obsidian";
+import { MarkdownView, TFile, App, Platform, Notice } from "obsidian";
+import {
+  locateHeading,
+  type HeadingJumpTarget,
+} from "./textSections";
 
 /**
  * Outcome of reading the note to speak: the text on success, or a reason the
@@ -63,5 +67,61 @@ export class MarkdownHelper {
   getActiveFilePath(): string | null {
     const activeFile = this.app.workspace.getActiveFile();
     return activeFile?.path || null;
+  }
+
+  /**
+   * Scroll the live note to a playlist section. Re-reads the current editor
+   * text so a heading that moved still resolves; if it was renamed or deleted
+   * (audio is stale), shows a notice and does nothing.
+   */
+  async revealHeading(
+    filePath: string | null,
+    jump: HeadingJumpTarget | null,
+  ): Promise<void> {
+    if (!filePath || !jump) {
+      return;
+    }
+    const file = this.app.vault.getAbstractFileByPath(filePath);
+    if (!(file instanceof TFile)) {
+      return;
+    }
+
+    let view = this.findMarkdownView(file);
+    if (!view && !Platform.isMobile) {
+      const leaf = this.app.workspace.getLeaf(false);
+      await leaf.openFile(file);
+      if (leaf.view instanceof MarkdownView) {
+        view = leaf.view;
+      }
+    }
+    if (!view) {
+      return;
+    }
+
+    const source = view.editor?.getValue() ?? (await this.app.vault.cachedRead(file));
+    const line = locateHeading(source, jump);
+    if (line === null) {
+      new Notice(
+        "That heading is gone from the note. The audio was generated from an older version.",
+      );
+      return;
+    }
+
+    if (view.editor) {
+      const pos = { line, ch: 0 };
+      view.editor.setCursor(pos);
+      view.editor.scrollIntoView({ from: pos, to: pos }, true);
+    }
+    if (!Platform.isMobile) {
+      await this.app.workspace.revealLeaf(view.leaf);
+    }
+  }
+
+  private findMarkdownView(file: TFile): MarkdownView | null {
+    const views = this.app.workspace
+      .getLeavesOfType("markdown")
+      .map((leaf) => leaf.view)
+      .filter((view): view is MarkdownView => view instanceof MarkdownView);
+    return views.find((view) => view.file === file) ?? null;
   }
 }

@@ -10,6 +10,7 @@ import { TextSpeaker } from "./TextSpeaker";
 import { VoicePlayerView, VIEW_TYPE_VOICE_PLAYER } from "../ui/VoicePlayerView";
 import { WhatsNewModal } from "../ui/WhatsNewModal";
 import { shouldShowWhatsNew } from "./whatsNew";
+import type { HeadingJumpTarget } from "./textSections";
 
 export class Voice extends Plugin {
   settings: VoiceSettings;
@@ -224,6 +225,17 @@ export class Voice extends Plugin {
    * Persist the chosen voice to the correct settings key for the active
    * provider, apply it to the running provider, and refresh the display.
    */
+  /**
+   * Jump the note editor to a playlist section. Uses the live file so a moved
+   * heading still works; a renamed/deleted heading is reported as stale audio.
+   */
+  public async revealNoteSection(
+    filePath: string | null,
+    jump: HeadingJumpTarget | null,
+  ): Promise<void> {
+    await this.markdownHelper.revealHeading(filePath, jump);
+  }
+
   public async persistActiveVoice(voiceId: string): Promise<void> {
     if (this.settings.TTS_PROVIDER === "elevenlabs") {
       this.settings.ELEVENLABS_VOICE = voiceId;

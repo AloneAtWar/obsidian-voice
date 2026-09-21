@@ -7,6 +7,7 @@ import {
   normalizePath,
 } from "obsidian";
 import type { Voice } from "../utils/VoicePlugin";
+import type { NoteSectionInfo } from "../service/SpeechProvider";
 import {
   MIN_PLAYBACK_SPEED,
   MAX_PLAYBACK_SPEED,
@@ -877,7 +878,7 @@ export class VoicePlayerView extends ItemView {
 
   /** Render heading/chunk sections of the note currently being read. */
   private renderNoteSections(
-    sections: { title: string; ready: boolean }[],
+    sections: NoteSectionInfo[],
     currentIndex: number,
   ): void {
     this.closeChapterActions();
@@ -910,6 +911,10 @@ export class VoicePlayerView extends ItemView {
           this.currentChapterPath = null;
           this.provider().playNoteSection(index);
           this.updateTitle();
+          void this.plugin.revealNoteSection(
+            this.provider().getNotePlaylistFilePath(),
+            section.jump,
+          );
         }
       });
     });
@@ -1218,6 +1223,11 @@ export class VoicePlayerView extends ItemView {
       const current = provider.getNoteSectionIndex();
       if (current > 0) {
         provider.playNoteSection(current - 1);
+        const target = provider.getNoteSections()[current - 1];
+        void this.plugin.revealNoteSection(
+          provider.getNotePlaylistFilePath(),
+          target?.jump ?? null,
+        );
       }
       return;
     }
@@ -1238,6 +1248,10 @@ export class VoicePlayerView extends ItemView {
       const next = provider.getNoteSectionIndex() + 1;
       if (next < sections.length && sections[next].ready) {
         provider.playNoteSection(next);
+        void this.plugin.revealNoteSection(
+          provider.getNotePlaylistFilePath(),
+          sections[next].jump,
+        );
       }
       return;
     }

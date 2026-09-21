@@ -5,7 +5,11 @@ import {
   type VoiceSettings,
 } from "../settings/VoiceSettings";
 import { BaseSpeechService } from "./BaseSpeechService";
-import type { CredentialValidationResult } from "./SpeechProvider";
+import type {
+  CredentialValidationResult,
+  NoteSectionInput,
+} from "./SpeechProvider";
+import type { HeadingJumpTarget } from "../utils/textSections";
 import { chunkPlainText } from "./textChunker";
 import { joinAudioChunks } from "./OpenAiSpeechService";
 import {
@@ -125,7 +129,7 @@ export class MimoSpeechService extends BaseSpeechService {
   }
 
   async speakNoteSections(
-    sections: { title: string; text: string }[],
+    sections: NoteSectionInput[],
     speed?: number,
     filePath?: string,
   ): Promise<void> {
@@ -163,28 +167,38 @@ export class MimoSpeechService extends BaseSpeechService {
    * as soon as the first blob is ready, and join everything for download.
    */
   private async speakPrepared(
-    parts: { title: string; text: string }[],
+    parts: NoteSectionInput[],
     speed?: number,
     filePath?: string,
   ): Promise<void> {
-    const units: { title: string; text: string }[] = [];
+    const units: {
+      title: string;
+      text: string;
+      jump: HeadingJumpTarget | null;
+    }[] = [];
     for (const part of parts) {
+      const jump = part.jump ?? null;
       const chunks = chunkPlainText(part.text.trim(), MAX_CHUNK_CHARS);
       if (chunks.length <= 1) {
-        units.push({ title: part.title, text: chunks[0] ?? part.text });
+        units.push({
+          title: part.title,
+          text: chunks[0] ?? part.text,
+          jump,
+        });
         continue;
       }
       chunks.forEach((chunk, index) => {
         units.push({
           title: `${part.title} (${index + 1}/${chunks.length})`,
           text: chunk,
+          jump,
         });
       });
     }
 
     this.reportProgress(0, 1);
     this.beginNotePlaylist(
-      units.map((unit) => unit.title),
+      units.map((unit) => ({ title: unit.title, jump: unit.jump })),
       filePath,
     );
 

@@ -13,7 +13,9 @@ import type {
   SpeechProvider,
   CredentialValidationResult,
   NoteSectionInfo,
+  NoteSectionInput,
 } from "./SpeechProvider";
+import type { HeadingJumpTarget } from "../utils/textSections";
 import type { VoiceSettings, VoiceOption } from "../settings/VoiceSettings";
 import {
   DEFAULT_SKIP_SECONDS,
@@ -44,7 +46,11 @@ export abstract class BaseSpeechService implements SpeechProvider {
   protected lastProgress: number = 0;
   // In-note playlist: heading/chunk blobs played in sequence so the first
   // section can start before the rest of the note has finished synthesizing.
-  private noteSections: { title: string; blob: Blob | null }[] = [];
+  private noteSections: {
+    title: string;
+    blob: Blob | null;
+    jump: HeadingJumpTarget | null;
+  }[] = [];
   private noteSectionIndex = 0;
   private notePlaylistActive = false;
   private noteWaitingForNext = false;
@@ -77,7 +83,7 @@ export abstract class BaseSpeechService implements SpeechProvider {
    * section-by-section (MiMo) override this.
    */
   async speakNoteSections(
-    sections: { title: string; text: string }[],
+    sections: NoteSectionInput[],
     speed?: number,
     filePath?: string,
   ): Promise<void> {
@@ -387,6 +393,7 @@ export abstract class BaseSpeechService implements SpeechProvider {
     return this.noteSections.map((section) => ({
       title: section.title,
       ready: section.blob !== null,
+      jump: section.jump,
     }));
   }
 
@@ -410,13 +417,24 @@ export abstract class BaseSpeechService implements SpeechProvider {
     this.revokeNoteObjectUrls();
   }
 
+  getNotePlaylistFilePath(): string | null {
+    return this.notePlaylistActive ? this.lastGeneratedAudioFilePath : null;
+  }
+
   /**
    * Start an in-note playlist. `appendNoteSection` fills blobs in order and
    * starts playback as soon as the first one arrives.
    */
-  protected beginNotePlaylist(titles: string[], filePath?: string): void {
+  protected beginNotePlaylist(
+    items: { title: string; jump?: HeadingJumpTarget | null }[],
+    filePath?: string,
+  ): void {
     this.revokeNoteObjectUrls();
-    this.noteSections = titles.map((title) => ({ title, blob: null }));
+    this.noteSections = items.map((item) => ({
+      title: item.title,
+      blob: null,
+      jump: item.jump ?? null,
+    }));
     this.noteSectionIndex = 0;
     this.notePlaylistActive = true;
     this.noteWaitingForNext = false;

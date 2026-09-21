@@ -10,7 +10,11 @@ import {
   friendlySpeechError,
 } from "./speechFeedback";
 import { Notice } from "obsidian";
-import { splitMarkdownByHeading } from "./textSections";
+import {
+  jumpTargetFromSection,
+  splitMarkdownByHeading,
+  type HeadingJumpTarget,
+} from "./textSections";
 
 /**
  * TextSpeaker - Orchestrates text-to-speech conversion
@@ -122,13 +126,18 @@ export class TextSpeaker {
       try {
         if (this.provider.inputFormat === "text") {
           const sections = splitMarkdownByHeading(rawText);
-          const parts: { title: string; text: string }[] = [];
+          const parts: {
+            title: string;
+            text: string;
+            jump: HeadingJumpTarget;
+          }[] = [];
           for (const section of sections) {
             const text = await this.processContent(section.markdown);
             if (text && text.trim()) {
               parts.push({
                 title: section.title || "Note",
                 text,
+                jump: jumpTargetFromSection(section),
               });
             }
           }

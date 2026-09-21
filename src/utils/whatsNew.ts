@@ -92,7 +92,7 @@ Every control is one button; a few do double duty — **tap** vs. **press & hold
 
 **Eight providers, your pick** — bring the engine you already use; every feature works identically on all of them: AWS Polly · ElevenLabs · OpenAI · Google Cloud · Azure Speech · MiniMax · **Xiaomi MiMo TTS** · OpenAI-compatible.
 
-**Player & playback** — chapters, scrubber, speed (0.5×–2.0×), and repeat modes (off / one / all), plus configurable rewind & fast-forward (1–60 s). Switch provider, voice, and the content toggles without leaving the player — with live feedback while a note synthesizes.
+**Player & playback** — chapters, scrubber, speed (0.5×–3.0×), and repeat modes (off / one / all), plus configurable rewind & fast-forward (1–60 s). Switch provider, voice, and the content toggles without leaving the player — with live feedback while a note synthesizes.
 
 **Your audio** — save MP3s next to the note or in a **default folder**, optionally **auto-save** and **embed** them, and **move / rename / delete** saved chapters from the player.
 

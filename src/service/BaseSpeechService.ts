@@ -19,6 +19,8 @@ import {
   DEFAULT_SKIP_SECONDS,
   MIN_SKIP_SECONDS,
   MAX_SKIP_SECONDS,
+  MIN_PLAYBACK_SPEED,
+  MAX_PLAYBACK_SPEED,
 } from "../settings/VoiceSettings";
 import type { PauseStyle } from "../types/ProcessorTypes";
 
@@ -123,10 +125,10 @@ export abstract class BaseSpeechService implements SpeechProvider {
     let fSpeed =
       typeof speed === "number" ? parseFloat(speed.toFixed(2)) : this.speed;
 
-    if (fSpeed < 0.5) {
-      fSpeed = 0.5;
-    } else if (fSpeed > 2) {
-      fSpeed = 2;
+    if (fSpeed < MIN_PLAYBACK_SPEED) {
+      fSpeed = MIN_PLAYBACK_SPEED;
+    } else if (fSpeed > MAX_PLAYBACK_SPEED) {
+      fSpeed = MAX_PLAYBACK_SPEED;
     }
 
     this.audio.playbackRate = fSpeed;
@@ -222,11 +224,10 @@ export abstract class BaseSpeechService implements SpeechProvider {
       let fSpeed =
         typeof speed === "number" ? parseFloat(speed.toFixed(2)) : this.speed;
 
-      // Clamp speed to supported range
-      if (fSpeed < 0.5) {
-        fSpeed = 0.5;
-      } else if (fSpeed > 2) {
-        fSpeed = 2;
+      if (fSpeed < MIN_PLAYBACK_SPEED) {
+        fSpeed = MIN_PLAYBACK_SPEED;
+      } else if (fSpeed > MAX_PLAYBACK_SPEED) {
+        fSpeed = MAX_PLAYBACK_SPEED;
       }
 
       this.audio.playbackRate = fSpeed;

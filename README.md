@@ -49,7 +49,7 @@ Every control is a single button. Some do **two things**: a quick **tap** and a 
 | ⏮ ⏭ **Prev / next**                         | Jump to the previous / next chapter                              | —                                                                       |
 | ⏪ ⏩ **Rewind / forward**                    | Jump back / ahead by your interval (default 3 s)                 | —                                                                       |
 | 🔁 **Repeat**                                 | Cycle _off → repeat one → repeat all_                            | —                                                                       |
-| **− / +** **Speed**                           | Slow down / speed up playback (0.5×–2.0×)                        | —                                                                       |
+| **− / +** **Speed**                           | Slow down / speed up playback (0.5×–3.0×)                        | —                                                                       |
 | ⬇️ **Save** (💾 when a default folder is set) | Save the MP3 now — next to the note, or into your default folder | Open the **folder picker** to save elsewhere or set a default           |
 | 📂 **Folder**                                 | Save into a folder you pick, in one click                        | —                                                                       |
 | `</>` **Read code blocks**                    | Toggle reading fenced code aloud                                 | —                                                                       |
@@ -122,7 +122,7 @@ In the Voice player there's also a dedicated **folder button** (📂, next to th
 
 - Use rewind / fast-forward and on-the-fly speed changes for quick navigation — from the player or the status bar.
 - Set how far rewind and fast-forward jump — configure each independently from 1 to 60 seconds in settings (defaults to 3 seconds).
-- **Speed on the fly** — nudge playback with the player's **− / +** control (0.5×–2.0×) or from the status bar; hotkeys can also jump to preset tempos.
+- **Speed on the fly** — nudge playback with the player's **− / +** control (0.5×–3.0×) or from the status bar; hotkeys can also jump to preset tempos.
 
   ![speed control](./assets/tempo.png)
 

@@ -140,6 +140,10 @@ export const MIN_SKIP_SECONDS = 1;
 export const MAX_SKIP_SECONDS = 60;
 export const DEFAULT_SKIP_SECONDS = 3;
 
+/** Bounds for client-side playback rate (the HTML audio element). */
+export const MIN_PLAYBACK_SPEED = 0.5;
+export const MAX_PLAYBACK_SPEED = 3.0;
+
 export interface VoiceOption {
   id: string;
   label: string;

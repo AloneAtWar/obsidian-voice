@@ -7,7 +7,11 @@ import {
   normalizePath,
 } from "obsidian";
 import type { Voice } from "../utils/VoicePlugin";
-import type { TtsProvider } from "../settings/VoiceSettings";
+import {
+  MIN_PLAYBACK_SPEED,
+  MAX_PLAYBACK_SPEED,
+  type TtsProvider,
+} from "../settings/VoiceSettings";
 import { audioFilesInFolder } from "../utils/folderAudio";
 import {
   AUDIO_EXTENSIONS,
@@ -28,8 +32,7 @@ import { groupVoicesByLanguage } from "../service/voiceCatalog";
 
 export const VIEW_TYPE_VOICE_PLAYER = "voice-player-view";
 
-const MIN_SPEED = 0.5;
-const MAX_SPEED = 2.0;
+
 
 type RepeatMode = "none" | "one" | "all";
 
@@ -758,8 +761,8 @@ export class VoicePlayerView extends ItemView {
   private changeSpeed(delta: number): void {
     const current = this.provider().getSpeed();
     const next = Math.min(
-      MAX_SPEED,
-      Math.max(MIN_SPEED, Math.round((current + delta) * 10) / 10),
+      MAX_PLAYBACK_SPEED,
+      Math.max(MIN_PLAYBACK_SPEED, Math.round((current + delta) * 10) / 10),
     );
     if (next !== current) {
       this.provider().setSpeed(next);
